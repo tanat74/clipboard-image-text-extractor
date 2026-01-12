@@ -24,7 +24,7 @@ def result():
 
         image_data = base64.b64decode(data.split(",")[1])
         image = Image.open(io.BytesIO(image_data))
-        text = pytesseract.image_to_string(image, lang='rus')
+        text = pytesseract.image_to_string(image, lang='rus+eng')
         if not text:
             return "Bad Request: No text found in the image", 400
 
