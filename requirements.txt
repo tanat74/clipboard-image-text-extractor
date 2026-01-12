@@ -1,5 +1,6 @@
 flask
 gunicorn
-flask
 Pillow
 pytesseract
+Flask-Limiter
+redis
