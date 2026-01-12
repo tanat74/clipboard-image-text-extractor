@@ -1,13 +1,17 @@
 const resultsP = document.querySelector("#results");
 const statusP = document.querySelector("#status");
 const copyBtn = document.querySelector("#copy");
+const languageSelect = document.querySelector("#language");
+const processedImage = document.querySelector("#processedImage");
 
 const originalBtnText = copyBtn.innerText;
+let currentImageData = null;
 
 document.addEventListener("paste", (event) => {
   try {
     statusP.innerText = "Processing image...";
     copyBtn.style.display = "none";
+    processedImage.style.display = "none";
 
     const items = (event.clipboardData || event.originalEvent.clipboardData)
       .items;
@@ -18,7 +22,10 @@ document.addEventListener("paste", (event) => {
       if (item.kind === "file") {
         const blob = item.getAsFile();
         const reader = new FileReader();
-        reader.onload = async (event) => await extractText(event.target.result);
+        reader.onload = async (event) => {
+          currentImageData = event.target.result;
+          await extractText(currentImageData);
+        };
         reader.readAsDataURL(blob);
         processed = true;
         break;
@@ -37,12 +44,13 @@ document.addEventListener("paste", (event) => {
 });
 
 async function extractText(base64data) {
+  const language = languageSelect.value;
   const res = await fetch("/results", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: "data=" + encodeURIComponent(base64data),
+    body: "data=" + encodeURIComponent(base64data) + "&language=" + encodeURIComponent(language),
   });
 
   const data = await res.text();
@@ -53,13 +61,25 @@ async function extractText(base64data) {
   }
 
   statusP.innerText = "Image processed! Paste another image to process it.";
-  resultsP.innerText = data;
+  resultsP.value = data;
+  
+  // Display the processed image
+  processedImage.src = currentImageData;
+  processedImage.style.display = "block";
 }
+
+// Re-process image when language changes
+languageSelect.addEventListener("change", async () => {
+  if (currentImageData) {
+    statusP.innerText = "Processing image...";
+    await extractText(currentImageData);
+  }
+});
 
 copyBtn.addEventListener("click", () => {
   copyBtn.innerText = originalBtnText;
 
-  navigator.clipboard.writeText(resultsP.innerText);
+  navigator.clipboard.writeText(resultsP.value);
 
   copyBtn.innerText = "Text copied!";
   setTimeout(() => {

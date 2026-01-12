@@ -6,10 +6,26 @@
 {% block content %}
 <main>
   <h2>Paste to process image</h2>
+  <div style="margin-bottom: 20px;">
+    <label for="language">Select language:</label>
+    <select id="language">
+      <option value="rus">Русский</option>
+      <option value="eng">English</option>
+      <option value="rus+eng" selected>Русский + English</option>
+      <option value="eng+rus">English + Русский</option>
+    </select>
+  </div>
   <p id="status">Paste an image to process it.</p>
   <hr />
   <button type="button" id="copy">Copy text</button>
-  <p id="results"></p>
+  <div style="display: flex; gap: 20px; margin-top: 20px;">
+    <div style="flex: 1;">
+      <textarea id="results" style="width: 100%; min-height: 300px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;"></textarea>
+    </div>
+    <div style="flex: 1;">
+      <img id="processedImage" style="max-width: 100%; display: none; border: 1px solid #ccc; border-radius: 4px;" />
+    </div>
+  </div>
 </main>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}
