@@ -4,7 +4,7 @@ services:
     build:
       context: .
     ports:
-      - 8000:8000
+      - 4400:8000
     develop:
       watch:
         - action: rebuild
