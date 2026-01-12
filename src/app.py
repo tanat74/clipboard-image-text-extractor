@@ -7,8 +7,6 @@ from flask import Flask, render_template, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from functools import wraps
-import redis
-import os
 
 app = Flask(__name__)
 
@@ -20,21 +18,11 @@ def get_client_ip():
     return request.remote_addr
 
 
-# Rate limiting with Redis storage
-redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
-try:
-    redis_client = redis.from_url(redis_url)
-    redis_client.ping()
-    storage_uri = redis_url
-except Exception:
-    # Fallback to in-memory if Redis is not available
-    storage_uri = None
-
+# Rate limiting with in-memory storage
 limiter = Limiter(
     app=app,
     key_func=get_client_ip,
-    default_limits=["200 per day", "50 per hour"],
-    storage_uri=storage_uri
+    default_limits=["200 per day", "50 per hour"]
 )
 
 # Configuration
