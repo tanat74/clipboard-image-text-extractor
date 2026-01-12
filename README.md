@@ -1,3 +1,7 @@
++ Поддержка Русского языка с возможностью выбора
++ Превью скриншота и возможность редактирования
++ Ограничения на запросы и т.п.
+
 # Clipboard Image Text Extractor
 
 This is a simple flask app that uses pytesseract to extract text from an image from the clipboard. It's containerized with docker so that you don't have to have pytesseract installed on your machine.
