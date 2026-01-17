@@ -1,6 +1,6 @@
 import io
 import base64
-import signal
+import threading
 import pytesseract  # type: ignore
 from PIL import Image, UnidentifiedImageError
 from flask import Flask, render_template, request
@@ -31,20 +31,33 @@ ALLOWED_LANGUAGES = {"rus", "eng", "rus+eng", "eng+rus"}
 TIMEOUT_SECONDS = 30
 
 
-def timeout_handler(signum, frame):
-    raise TimeoutError("Image processing timeout")
+class TimeoutException(Exception):
+    pass
 
 
 def process_with_timeout(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        signal.signal(signal.SIGALRM, timeout_handler)
-        signal.alarm(TIMEOUT_SECONDS)
-        try:
-            result = func(*args, **kwargs)
-        finally:
-            signal.alarm(0)
-        return result
+        result = [None]
+        exception = [None]
+        
+        def target():
+            try:
+                result[0] = func(*args, **kwargs)
+            except Exception as e:
+                exception[0] = e
+        
+        thread = threading.Thread(target=target, daemon=True)
+        thread.start()
+        thread.join(timeout=TIMEOUT_SECONDS)
+        
+        if thread.is_alive():
+            raise TimeoutError("Image processing timeout")
+        
+        if exception[0]:
+            raise exception[0]
+        
+        return result[0]
     return wrapper
 
 
