@@ -5,6 +5,13 @@ services:
       context: .
     ports:
       - 4400:8000
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    restart: unless-stopped
     develop:
       watch:
         - action: rebuild

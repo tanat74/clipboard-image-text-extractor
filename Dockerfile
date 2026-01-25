@@ -31,4 +31,4 @@ USER appuser
 
 COPY --chown=appuser:appuser ./src ./src
 
-CMD gunicorn -w 2 -b :8000 --timeout 120 --graceful-timeout 30 src.app:app
+CMD gunicorn -w 1 -b :8000 --timeout 120 --graceful-timeout 30 --max-requests 100 --max-requests-jitter 10 src.app:app
